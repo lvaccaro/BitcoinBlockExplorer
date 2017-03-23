@@ -18,6 +18,7 @@ import org.bitcoinj.core.listeners.PeerConnectedEventListener;
 import org.bitcoinj.core.listeners.PeerDisconnectedEventListener;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import io.merkur.bitcoinblockexplorer.MyApplication;
 import io.merkur.bitcoinblockexplorer.R;
@@ -39,7 +40,7 @@ public class FragmentPeers extends Fragment implements MyApplication.MyListener 
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private TextView tvStatus;
-    public final HashMap<Peer, String> reverseDnsLookups = new HashMap<>();
+    public final LinkedHashMap<Peer, String> reverseDnsLookups = new LinkedHashMap<>();
     private long lastTimestamp=0;
 
     public FragmentPeers() {

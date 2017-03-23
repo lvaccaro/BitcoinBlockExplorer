@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import cz.msebera.android.httpclient.Header;
 import io.merkur.bitcoinblockexplorer.insight.Block;
@@ -38,7 +39,7 @@ public class TxActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private final HashMap<String, String> mDataset = new HashMap<>();
+    private final LinkedHashMap<String, String> mDataset = new LinkedHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,7 +192,7 @@ public class TxActivity extends AppCompatActivity {
 
     public void verify(){
         // Generate Merkle Root from TXs
-        String merkleRoot = Block.merkle(block.tx);
+        String merkleRoot = Block.merkle(block.transactions);
 
         // Get block from blockstore
         Sha256Hash hash = new Sha256Hash(block.hash);

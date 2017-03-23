@@ -11,13 +11,14 @@ import android.widget.TextView;
 import org.bitcoinj.core.Block;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import io.merkur.bitcoinblockexplorer.activities.BlockActivity;
 import io.merkur.bitcoinblockexplorer.R;
 
 public class BlocksAdapter extends RecyclerView.Adapter<BlocksAdapter.ViewHolder> {
 
-    HashMap<Block, Integer> mDataset = new HashMap<>();
+    LinkedHashMap<Block, Integer> mDataset = new LinkedHashMap<>();
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
@@ -36,7 +37,7 @@ public static class ViewHolder extends RecyclerView.ViewHolder {
     }
 }
     // Provide a suitable constructor (depends on the kind of dataset)
-    public BlocksAdapter(HashMap<Block, Integer> myDataset) {
+    public BlocksAdapter(LinkedHashMap<Block, Integer> myDataset) {
         this.mDataset = myDataset;
     }
 

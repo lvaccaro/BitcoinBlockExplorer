@@ -23,6 +23,7 @@ import org.bitcoinj.core.listeners.NewBestBlockListener;
 import org.bitcoinj.store.BlockStoreException;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javax.annotation.Nullable;
 
@@ -48,7 +49,7 @@ public class FragmentBlocks extends Fragment implements MyApplication.MyListener
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private TextView tvStatus;
-    public final HashMap<Block, Integer> blocks = new HashMap<>();
+    public final LinkedHashMap<Block, Integer> blocks = new LinkedHashMap<>();
     private long lastTimestamp=0;
 
     public FragmentBlocks() {

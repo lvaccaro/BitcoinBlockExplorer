@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import org.bitcoinj.core.Peer;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import io.merkur.bitcoinblockexplorer.R;
 import io.merkur.bitcoinblockexplorer.adapters.ItemAdapter;
@@ -24,7 +25,7 @@ public class PeerActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private final HashMap<String, String> mDataset = new HashMap<>();
+    private final LinkedHashMap<String, String> mDataset = new LinkedHashMap<>();
     private Peer peer;
 
 

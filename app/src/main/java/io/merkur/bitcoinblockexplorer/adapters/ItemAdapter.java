@@ -4,32 +4,43 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import io.merkur.bitcoinblockexplorer.R;
 
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
-    private HashMap<String,String> mDataset = new HashMap<>();
+    private LinkedHashMap<String,String> mDataset = new LinkedHashMap<>();
+    OnItemClickListener mItemClickListener;
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         // each data item is just a string in this case
         public TextView mTvKey,mTvValue;
         public ViewHolder(View v) {
             super(v);
             mTvKey = (TextView) v.findViewById(R.id.tvKey);
             mTvValue = (TextView) v.findViewById(R.id.tvValue);
+            mTvKey.setOnClickListener(this);
+            mTvValue.setOnClickListener(this);
+        }
+        @Override
+        public void onClick(View v) {
+            System.out.println("onClick");
+            String key = mTvKey.getText().toString();
+            mItemClickListener.onItemClick(v, getAdapterPosition(), key); //OnItemClickListener mItemClickListener;
         }
     }
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ItemAdapter(HashMap<String,String> myDataset) {
+    public ItemAdapter(LinkedHashMap<String,String> myDataset) {
         mDataset = myDataset;
     }
 
@@ -65,6 +76,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             }
         }
 
+    }
+
+    public interface OnItemClickListener {
+        public void onItemClick(View view, int position, String id);
+    }
+
+    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
     }
 
     // Return the size of your dataset (invoked by the layout manager)

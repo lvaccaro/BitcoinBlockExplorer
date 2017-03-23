@@ -7,5 +7,6 @@
     <string name="current_height">Current height</string>
     <string name="peers_connected">Peers connected</string>
     <string name="transactions">Transactions</string>
+    <string name="copied_text_to_clipboard">\"Copied text to Clipboard\"</string>
 
 </resources>

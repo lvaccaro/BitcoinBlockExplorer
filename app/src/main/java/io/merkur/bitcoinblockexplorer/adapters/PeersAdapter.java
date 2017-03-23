@@ -11,6 +11,7 @@ import android.widget.TextView;
 import org.bitcoinj.core.Peer;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import io.merkur.bitcoinblockexplorer.activities.PeerActivity;
 import io.merkur.bitcoinblockexplorer.R;
@@ -18,7 +19,7 @@ import io.merkur.bitcoinblockexplorer.R;
 
 public class PeersAdapter extends RecyclerView.Adapter<PeersAdapter.ViewHolder> {
 
-    HashMap<Peer, String> mDataset = new HashMap<>();
+    LinkedHashMap<Peer, String> mDataset = new LinkedHashMap<>();
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
@@ -38,7 +39,7 @@ public static class ViewHolder extends RecyclerView.ViewHolder {
     }
 }
     // Provide a suitable constructor (depends on the kind of dataset)
-    public PeersAdapter(HashMap<Peer, String>  myDataset) {
+    public PeersAdapter(LinkedHashMap<Peer, String>  myDataset) {
         mDataset = myDataset;
     }
 

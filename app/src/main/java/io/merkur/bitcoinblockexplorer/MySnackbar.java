@@ -15,7 +15,7 @@ public class MySnackbar {
         View sbView = snackbar.getView();
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.GREEN);
-        snackbar.setDuration(10*1000);
+        snackbar.setDuration(3*1000);
         snackbar.show();
     }
     public static void showNegative(Activity activity, String message) {
@@ -23,7 +23,7 @@ public class MySnackbar {
         View sbView = snackbar.getView();
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.RED);
-        snackbar.setDuration(10*1000);
+        snackbar.setDuration(3*1000);
         snackbar.show();
     }
     public static void showWarning(Activity activity, String message) {
@@ -31,7 +31,7 @@ public class MySnackbar {
         View sbView = snackbar.getView();
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.YELLOW);
-        snackbar.setDuration(10*1000);
+        snackbar.setDuration(3*1000);
         snackbar.show();
     }
 }

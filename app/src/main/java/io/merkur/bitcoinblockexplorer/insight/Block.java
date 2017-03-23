@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Block {
@@ -16,7 +17,7 @@ public class Block {
     public Long height;
     public Long version;
     public String merkleroot;
-    public List<String> tx;
+    public List<String> transactions;
     public Long time;
     public Long nonce;
     public String bits;
@@ -101,21 +102,21 @@ poolInfo: { }
         block.isMainChain=json.getBoolean("isMainChain");
         }catch (Exception e){}
         try {
-        block.tx=new ArrayList<>();
+        block.transactions=new ArrayList<>();
         for (int i=0; i<json.getJSONArray("tx").length();i++){
-            block.tx.add(json.getJSONArray("tx").get(i).toString());
+            block.transactions.add(json.getJSONArray("tx").get(i).toString());
         }
         }catch (Exception e){}
         return block;
     }
 
-    public HashMap<String, String> toDataset(){
-        HashMap<String, String> mDataset = new HashMap<>();
+    public LinkedHashMap<String, String> toDataset(){
+        LinkedHashMap<String, String> mDataset = new LinkedHashMap<>();
         Date date = new Date(this.time);
         mDataset.put("Hash",this.hash);
         mDataset.put("Height",String.valueOf(this.height));
-        mDataset.put("Prev",this.previousblockhash);
-        mDataset.put("Next",this.nextblockhash);
+        mDataset.put("Prev Block",this.previousblockhash);
+        mDataset.put("Next Block",this.nextblockhash);
         mDataset.put("MerkleRoot",this.merkleroot);
         mDataset.put("DifficultyTarget",String.valueOf(this.difficulty));
         mDataset.put("Nonce",String.valueOf(this.nonce));
@@ -126,7 +127,12 @@ poolInfo: { }
         mDataset.put("Reward",String.valueOf(this.reward));
         mDataset.put("Confirmations",String.valueOf(this.confirmations));
         mDataset.put("isMainChain",String.valueOf(this.isMainChain));
-        mDataset.put("Transactions",String.valueOf(this.tx.size()));
+        mDataset.put("Transactions",String.valueOf(this.transactions.size()));
+        int i=0;
+        for (String tx : this.transactions){
+            mDataset.put(String.valueOf(i)+" Transaction",tx);
+            i++;
+        }
         return mDataset;
     }
 

@@ -1,5 +1,7 @@
 package io.merkur.bitcoinblockexplorer.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,12 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.TextView;
 
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.StoredBlock;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import io.merkur.bitcoinblockexplorer.MySnackbar;
 import io.merkur.bitcoinblockexplorer.R;
@@ -27,9 +31,9 @@ public class BlockActivity extends AppCompatActivity {
 
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private ItemAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private HashMap<String, String> mDataset = new HashMap<>();
+    private LinkedHashMap<String, String> mDataset = new LinkedHashMap<>();
     private StoredBlock storedBlock;
     private io.merkur.bitcoinblockexplorer.insight.Block block;
     private String block_address;
@@ -58,6 +62,39 @@ public class BlockActivity extends AppCompatActivity {
         // specify an adapter (see also next example)
         mAdapter = new ItemAdapter(mDataset);
         mRecyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new ItemAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position, String key) {
+                System.out.println("onItemClick" + key);
+                if(key==null){
+                    return;
+                }
+                String value = mDataset.get(key);
+                if(value==null){
+                    return;
+                }
+                if(key.contains("Block")){
+                    Intent intent = new Intent(BlockActivity.this, BlockActivity.class);
+                    intent.putExtra("block", value);
+                    startActivity(intent);
+                } else if(key.contains(" Transaction")){
+                    Intent intent = new Intent(BlockActivity.this, TxActivity.class);
+                    intent.putExtra("tx", value);
+                    startActivity(intent);
+                } else {
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                        android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        clipboard.setText(value);
+                    } else {
+                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", value);
+                        clipboard.setPrimaryClip(clip);
+                    }
+                    MySnackbar.showPositive(BlockActivity.this, getResources().getString(R.string.copied_text_to_clipboard));
+                }
+            }
+        });
 
         setStatusPending();
 

@@ -10,11 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tvKey"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:clickable="false"
+        android:focusable="false"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tvValue" />
+        android:id="@+id/tvValue"
+        android:clickable="false"
+        android:focusable="false" />
 
 </LinearLayout>
