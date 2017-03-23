@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Bitcoin Block Explorer</string>
+    <string name="title_activity_main">Bitcoin Block Explorer</string>
+    <string name="title_activity_peer">Peer</string>
+    <string name="title_activity_tx">Transaction</string>
+    <string name="title_activity_block">Block</string>
+    <string name="current_height">Current height</string>
+    <string name="peers_connected">Peers connected</string>
+    <string name="transactions">Transactions</string>
+
+</resources>
