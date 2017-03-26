@@ -39,10 +39,16 @@ import io.merkur.bitcoinblockexplorer.insight.Insight;
 import io.merkur.bitcoinblockexplorer.insight.Tx;
 
 import static io.merkur.bitcoinblockexplorer.MyApplication.REQUEST_EXTERNAL_STORAGE;
+import static io.merkur.bitcoinblockexplorer.MyApplication.verifyStoragePermissions;
 
 public class MainActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener, SearchView.OnCloseListener,
          ConnectivityReceiver.ConnectivityReceiverListener{
+
+
+    public static int RESULT_BLOCK = 101;
+    public static int RESULT_TX = 102;
+    public static int RESULT_PEER = 103;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -81,6 +87,23 @@ public class MainActivity extends AppCompatActivity
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+
+        if (savedInstanceState==null) {
+            checkConnection();
+            if (verifyStoragePermissions(MainActivity.this)==true) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Bitcoin.start();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        }
+
     }
 
     // Method to manually check connection status
@@ -106,43 +129,26 @@ public class MainActivity extends AppCompatActivity
         // register connection status listener
         MyApplication.getInstance().setConnectivityListener(this);
 
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (!MyApplication.verifyStoragePermissions(this))
-            return;
-
-        if (!Bitcoin.isStarted) {
-            checkConnection();
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Bitcoin.startBlockChain();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        }
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Bitcoin.stopBlockChain();
+                    Bitcoin.resume();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Bitcoin.pause();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -162,7 +168,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     try {
-                        Bitcoin.startBlockChain();
+                        Bitcoin.resume();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -173,7 +179,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     try {
-                        Bitcoin.stopBlockChain();
+                        Bitcoin.pause();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -235,9 +241,9 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void run() {
                             try {
-                                Bitcoin.stopBlockChain();
-                                Bitcoin.clearBlockChain();
-                                Bitcoin.startBlockChain();
+                                Bitcoin.destroy();
+                                Bitcoin.clear();
+                                Bitcoin.start();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -317,7 +323,7 @@ public class MainActivity extends AppCompatActivity
         });
         executor.shutdown();
         try {
-            executor.awaitTermination(1, TimeUnit.SECONDS);
+            executor.awaitTermination(60, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -417,7 +423,7 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void run() {
                             try {
-                                Bitcoin.startBlockChain();
+                                Bitcoin.start();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -428,4 +434,5 @@ public class MainActivity extends AppCompatActivity
                 }
         }
     }
+
 }

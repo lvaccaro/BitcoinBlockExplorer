@@ -119,7 +119,7 @@ public class PeerActivity extends AppCompatActivity {
                 }
 
                 if(hostplace!=null) {
-                    MySnackbar.showNegative(PeerActivity.this,"Host Geolocation Success");
+                    MySnackbar.showPositive(PeerActivity.this,"Host Geolocation Success");
                     mDataset.putAll(hostplace.toDataset());
                     mAdapter.notifyDataSetChanged();
                 }

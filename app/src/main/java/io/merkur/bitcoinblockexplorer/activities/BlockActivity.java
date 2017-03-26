@@ -146,7 +146,10 @@ public class BlockActivity extends AppCompatActivity implements ItemAdapter.OnIt
                     setStatusFailed();
                     return;
                 }
-                //refresh(storedBlock);
+                if (storedBlock == null){
+                    MySnackbar.showWarning(BlockActivity.this, "Blockchain not sync");
+                    return;
+                }
                 if( block.equals(storedBlock) ){
                     MySnackbar.showPositive(BlockActivity.this, "Verification Success");
                     setStatusSuccess();

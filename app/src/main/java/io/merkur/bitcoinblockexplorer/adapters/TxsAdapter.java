@@ -20,18 +20,30 @@ import io.merkur.bitcoinblockexplorer.activities.TxActivity;
 public class TxsAdapter extends RecyclerView.Adapter<TxsAdapter.ViewHolder> {
 
     private List<Transaction> mDataset = new ArrayList<>();
+    TxsAdapter.OnItemClickListener mItemClickListener;
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
 
-public static class ViewHolder extends RecyclerView.ViewHolder {
+public class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
     // each data item is just a string in this case
     public TextView mTvTitle,mTvHash;
     public ViewHolder(View v) {
         super(v);
         mTvTitle = (TextView) v.findViewById(R.id.tvTitle);
         mTvHash = (TextView) v.findViewById(R.id.tvHash);
+        mTvTitle.setOnClickListener(this);
+        mTvHash.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        System.out.println("onClick");
+        String key = mTvHash.getText().toString();
+        if(mItemClickListener != null) {
+            mItemClickListener.onItemClick(v, getAdapterPosition(), key); //OnItemClickListener mItemClickListener;
+        }
     }
 }
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -63,20 +75,19 @@ public static class ViewHolder extends RecyclerView.ViewHolder {
                 final Transaction tx = mDataset.get(position);
                 holder.mTvTitle.setText(String.valueOf(tx.getOutputSum().getValue()/100000000) + " BTC"+((tx.isPending())?" (U)":""));
                 holder.mTvHash.setText(tx.getHashAsString());
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Context context = view.getContext();
-                        Intent intent = new Intent(context, TxActivity.class);
-                        intent.putExtra("tx",tx.getHashAsString().toString());
-                        view.getContext().startActivity(intent);
-                    }
-                });
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
 
+    }
+
+    public interface OnItemClickListener {
+        public void onItemClick(View view, int position, String id);
+    }
+
+    public void setOnItemClickListener(TxsAdapter.OnItemClickListener itemClickListener) {
+        this.mItemClickListener = itemClickListener;
     }
 
     // Return the size of your dataset (invoked by the layout manager)

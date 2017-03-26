@@ -1,6 +1,7 @@
 package io.merkur.bitcoinblockexplorer.activities;
 
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import cz.msebera.android.httpclient.Header;
+import io.merkur.bitcoinblockexplorer.MySnackbar;
 import io.merkur.bitcoinblockexplorer.insight.Block;
 import io.merkur.bitcoinblockexplorer.insight.Insight;
 import io.merkur.bitcoinblockexplorer.insight.Tx;
@@ -41,6 +43,13 @@ public class TxActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private final LinkedHashMap<String, String> mDataset = new LinkedHashMap<>();
+
+    String tx_address;
+    Tx tx;
+    Block block;
+    StoredBlock storedBlock;
+    String merkleRoot;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,21 +84,91 @@ public class TxActivity extends AppCompatActivity {
     }
 
     private void getTx() throws Exception {
-        String tx_address;
+
         try {
             tx_address = getIntent().getStringExtra("tx");
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception();
         }
-        insigthTx(tx_address);
+
+
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                try {
+                    tx = null;
+                    block=null;
+
+                    // Get tx from insight
+                    tx = Insight.getTx(tx_address);
+                    if(tx==null)
+                        return false;
+
+                    // Get block from insight
+                    block = Insight.getBlock(tx.blockhash);
+                    merkleRoot = Block.merkle(block.transactions);
+
+                    // Get block from blockstore
+                    Sha256Hash hash = new Sha256Hash(block.hash);
+                    storedBlock = blockStore.get(hash);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                setStatus("Verification Pending");
+            }
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+
+                if (aBoolean == false) {
+                    MySnackbar.showNegative(TxActivity.this, "Sorry! Tx not found");
+                    setStatus("Verification Failed");
+                    return;
+                }
+                if (tx == null) {
+                    MySnackbar.showNegative(TxActivity.this, "Sorry! Tx not found");
+                    setStatus("Verification Failed");
+                    return;
+                }
+
+                refresh();
+
+                if (block == null) {
+                    MySnackbar.showNegative(TxActivity.this, "Sorry! Block not found");
+                    setStatus("Verification Failed");
+                    return;
+                }
+                if (storedBlock == null){
+                    MySnackbar.showWarning(TxActivity.this, "Blockchain not sync");
+                    return;
+                }
+
+                if(merkleRoot.equals(block.merkleroot)){
+                    MySnackbar.showPositive(TxActivity.this, "Merkle Root Verified");
+                    setStatus("Verification Success");
+                } else {
+                    MySnackbar.showNegative(TxActivity.this, "Merkle Root Invalid");
+                    setStatus("Verification Failed");
+                }
+            }
+        }.execute();
     }
+
+
 
     private void refresh() {
 
         mDataset.clear();
 
-        if (tx == null || block == null) {
+        if (tx == null) {
             return;
         }
 
@@ -135,90 +214,7 @@ public class TxActivity extends AppCompatActivity {
     }
 
 
-    Tx tx;
-    Block block;
-    StoredBlock storedBlock;
-
-
-    public void insigthTx(String txid) {
-
-
-
-        String url = Insight.url + "/tx/" + txid;
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        try {
-                            tx = Tx.getJson(response);
-                            insigthBlock(tx.blockhash);
-                            refresh();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            showSnack("Request Insight failed");
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
-                        showSnack("Request Insight failed");
-                    }
-                }
-        );
-    }
-
-    public void insigthBlock(String blockhash) {
-        String url = Insight.url + "/block/" + blockhash;
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        block = Block.getJson(response);
-                            verify();
-                            refresh();
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
-                        showSnack("Request Insight failed");
-                    }
-                }
-        );
-    }
-
-
-
-
-    public void verify(){
-        // Generate Merkle Root from TXs
-        String merkleRoot = Block.merkle(block.transactions);
-
-        // Get block from blockstore
-        Sha256Hash hash = new Sha256Hash(block.hash);
-        try {
-            storedBlock = blockStore.get(hash);
-        } catch (BlockStoreException e) {
-            e.printStackTrace();
-            showSnack("Error to retrieve store block");
-            return;
-        }
-
-        // Compare Markle Root
-        if(merkleRoot.equals(block.merkleroot)){
-            showSnack("Merkle Root Verified");
-        } else {
-            showSnack("Merkle Root Invalid");
-        }
-    }
-
-
-    // Showing the status in Snackbar
-    private void showSnack(String message) {
-        Snackbar snackbar = Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_LONG);
-        View sbView = snackbar.getView();
-        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
-        snackbar.show();
+    public void setStatus(String message){
+        ((TextView)findViewById(R.id.tvStatus)).setText(message);
     }
 }

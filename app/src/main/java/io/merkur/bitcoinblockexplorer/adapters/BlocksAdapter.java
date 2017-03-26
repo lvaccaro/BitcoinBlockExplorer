@@ -15,16 +15,18 @@ import java.util.LinkedHashMap;
 
 import io.merkur.bitcoinblockexplorer.activities.BlockActivity;
 import io.merkur.bitcoinblockexplorer.R;
+import io.merkur.bitcoinblockexplorer.fragments.FragmentBlocks;
 
 public class BlocksAdapter extends RecyclerView.Adapter<BlocksAdapter.ViewHolder> {
 
     LinkedHashMap<Block, Integer> mDataset = new LinkedHashMap<>();
+    BlocksAdapter.OnItemClickListener mItemClickListener;
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
 
-public static class ViewHolder extends RecyclerView.ViewHolder {
+public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     // each data item is just a string in this case
     public TextView mTvTitle,mTvBlockHash,mTvHeight,mTvTransactions;
     public ViewHolder(View v) {
@@ -33,7 +35,18 @@ public static class ViewHolder extends RecyclerView.ViewHolder {
         mTvBlockHash = (TextView) v.findViewById(R.id.tvBlockHash);
         mTvHeight = (TextView) v.findViewById(R.id.tvHeight);
         mTvTransactions = (TextView) v.findViewById(R.id.tvTransactions);
+        mTvBlockHash.setOnClickListener(this);
+        mTvHeight.setOnClickListener(this);
+        mTvTransactions.setOnClickListener(this);
+    }
 
+    @Override
+    public void onClick(View v) {
+        System.out.println("onClick");
+        String key = mTvBlockHash.getText().toString();
+        if(mItemClickListener != null) {
+            mItemClickListener.onItemClick(v, getAdapterPosition(), key); //OnItemClickListener mItemClickListener;
+        }
     }
 }
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -67,17 +80,15 @@ public static class ViewHolder extends RecyclerView.ViewHolder {
             holder.mTvBlockHash.setText(block.getHashAsString());
             holder.mTvHeight.setText("Height: " + String.valueOf(height));
             holder.mTvTransactions.setText("Transactions: " + block.getTransactions().size());
-
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Context context = view.getContext();
-                    Intent intent = new Intent(context, BlockActivity.class);
-                    intent.putExtra("block",block.getHashAsString().toString());
-                    view.getContext().startActivity(intent);
-                }
-            });
         }
+    }
+
+    public interface OnItemClickListener {
+        public void onItemClick(View view, int position, String id);
+    }
+
+    public void setOnItemClickListener(BlocksAdapter.OnItemClickListener itemClickListener) {
+        this.mItemClickListener = itemClickListener;
     }
 
     // Return the size of your dataset (invoked by the layout manager)

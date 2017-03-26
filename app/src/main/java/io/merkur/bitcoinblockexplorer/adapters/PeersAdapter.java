@@ -20,22 +20,34 @@ import io.merkur.bitcoinblockexplorer.R;
 public class PeersAdapter extends RecyclerView.Adapter<PeersAdapter.ViewHolder> {
 
     LinkedHashMap<Peer, String> mDataset = new LinkedHashMap<>();
+    PeersAdapter.OnItemClickListener mItemClickListener;
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
 
-public static class ViewHolder extends RecyclerView.ViewHolder {
+public class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
     // each data item is just a string in this case
     public TextView mTvTitle,mTvIp,mTvBestHeight,mTvLastPingTime;
     public ViewHolder(View v) {
         super(v);
         mTvTitle = (TextView) v.findViewById(R.id.tvTitle);
         mTvIp = (TextView) v.findViewById(R.id.tvIp);
-
         mTvBestHeight = (TextView) v.findViewById(R.id.tvBestHeight);
         mTvLastPingTime = (TextView) v.findViewById(R.id.tvLastPingTime);
+        mTvTitle.setOnClickListener(this);
+        mTvIp.setOnClickListener(this);
+        mTvBestHeight.setOnClickListener(this);
+        mTvLastPingTime.setOnClickListener(this);
+    }
 
+    @Override
+    public void onClick(View v) {
+        System.out.println("onClick");
+        String key = mTvIp.getText().toString();
+        if(mItemClickListener != null) {
+            mItemClickListener.onItemClick(v, getAdapterPosition(), key); //OnItemClickListener mItemClickListener;
+        }
     }
 }
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -69,15 +81,15 @@ public static class ViewHolder extends RecyclerView.ViewHolder {
         holder.mTvIp.setText("Host: "+peer.getAddress().toString());
         holder.mTvBestHeight.setText("BestHeight: "+String.valueOf(peer.getBestHeight()));
         holder.mTvLastPingTime.setText("LastPingTime: "+String.valueOf(peer.getLastPingTime()));
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Context context = view.getContext();
-                Intent intent = new Intent(context, PeerActivity.class);
-                intent.putExtra("peer",peer.getAddress().toString());
-                view.getContext().startActivity(intent);
-            }
-        });
+    }
+
+
+    public interface OnItemClickListener {
+        public void onItemClick(View view, int position, String id);
+    }
+
+    public void setOnItemClickListener(PeersAdapter.OnItemClickListener itemClickListener) {
+        this.mItemClickListener = itemClickListener;
     }
 
     // Return the size of your dataset (invoked by the layout manager)

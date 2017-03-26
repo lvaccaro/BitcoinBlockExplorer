@@ -52,7 +52,7 @@ public class Bitcoin {
     public static File blockStoreFile;
     public static Boolean isStarted=false;
 
-    public static void clearBlockChain(){
+    public static void clear(){
         Log.d("BITCOINJ","Remove SPV block store:"+blockchainFilename+"\n");
         File blockStoreFile = new File(blockchainFilename);
         if(blockStoreFile.exists()){
@@ -62,7 +62,12 @@ public class Bitcoin {
         isStarted=false;
     }
 
-    public static void startBlockChain() throws Exception {
+    public static void start() throws Exception {
+
+        if (isStarted==true){
+            Log.d("BITCOINJ","Just started\n");
+            throw new Exception();
+        }
 
         // work with testnet
         Log.d("BITCOINJ","Set Network\n");
@@ -110,12 +115,25 @@ public class Bitcoin {
         peerGroup.startBlockChainDownload(myDownload);
         Log.d("BITCOINJ","Download Started");
         isStarted=true;
-
     }
 
-    public static void stopBlockChain(){
+    public static void pause(){
+        if(peerGroup!=null) {
+            peerGroup.stop();
+        }
+    }
+
+    public static void resume(){
+        if(peerGroup!=null && !peerGroup.isRunning()) {
+            peerGroup.start();
+        }
+    }
+
+    public static void destroy(){
         isStarted=false;
-        peerGroup.stop();
+        if(peerGroup!=null && peerGroup.isRunning()) {
+            peerGroup.stop();
+        }
         try {
             blockStore.close();
         } catch (BlockStoreException e) {

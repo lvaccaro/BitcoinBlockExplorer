@@ -1,6 +1,7 @@
 package io.merkur.bitcoinblockexplorer.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,12 +24,15 @@ import java.util.LinkedHashMap;
 import io.merkur.bitcoinblockexplorer.Bitcoin;
 import io.merkur.bitcoinblockexplorer.MyApplication;
 import io.merkur.bitcoinblockexplorer.R;
+import io.merkur.bitcoinblockexplorer.activities.BlockActivity;
+import io.merkur.bitcoinblockexplorer.activities.MainActivity;
+import io.merkur.bitcoinblockexplorer.activities.PeerActivity;
 import io.merkur.bitcoinblockexplorer.adapters.PeersAdapter;
 
 import static io.merkur.bitcoinblockexplorer.Bitcoin.peerGroup;
 
 
-public class FragmentPeers extends Fragment implements Bitcoin.MyListener {
+public class FragmentPeers extends Fragment implements Bitcoin.MyListener, PeersAdapter.OnItemClickListener {
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -38,7 +42,7 @@ public class FragmentPeers extends Fragment implements Bitcoin.MyListener {
 
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private PeersAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private TextView tvStatus;
     public final LinkedHashMap<Peer, String> reverseDnsLookups = new LinkedHashMap<>();
@@ -71,6 +75,7 @@ public class FragmentPeers extends Fragment implements Bitcoin.MyListener {
 
         // specify an adapter (see also next example)
         mAdapter = new PeersAdapter(reverseDnsLookups);
+        mAdapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(mAdapter);
 
         refreshUI();
@@ -173,5 +178,16 @@ public class FragmentPeers extends Fragment implements Bitcoin.MyListener {
         detach();
     }
 
+
+    @Override
+    public void onItemClick(View view, int position, String key) {
+        System.out.println("onItemClick" + key);
+        if (key == null) {
+            return;
+        }
+        Intent intent = new Intent(getContext(), PeerActivity.class);
+        intent.putExtra("peer",key);
+        startActivityForResult(intent, MainActivity.RESULT_PEER);
+    }
 
 }

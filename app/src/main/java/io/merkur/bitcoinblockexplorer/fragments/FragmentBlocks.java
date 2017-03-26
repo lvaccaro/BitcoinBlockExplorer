@@ -1,6 +1,7 @@
 package io.merkur.bitcoinblockexplorer.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,6 +31,8 @@ import javax.annotation.Nullable;
 import io.merkur.bitcoinblockexplorer.Bitcoin;
 import io.merkur.bitcoinblockexplorer.MyApplication;
 import io.merkur.bitcoinblockexplorer.R;
+import io.merkur.bitcoinblockexplorer.activities.BlockActivity;
+import io.merkur.bitcoinblockexplorer.activities.MainActivity;
 import io.merkur.bitcoinblockexplorer.adapters.BlocksAdapter;
 
 import static io.merkur.bitcoinblockexplorer.Bitcoin.blockChain;
@@ -37,7 +40,7 @@ import static io.merkur.bitcoinblockexplorer.Bitcoin.blockStore;
 import static io.merkur.bitcoinblockexplorer.Bitcoin.peerGroup;
 
 
-public class FragmentBlocks extends Fragment implements Bitcoin.MyListener {
+public class FragmentBlocks extends Fragment implements Bitcoin.MyListener, BlocksAdapter.OnItemClickListener {
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -47,7 +50,7 @@ public class FragmentBlocks extends Fragment implements Bitcoin.MyListener {
 
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private BlocksAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private TextView tvStatus;
     public final LinkedHashMap<Block, Integer> blocks = new LinkedHashMap<>();
@@ -80,6 +83,7 @@ public class FragmentBlocks extends Fragment implements Bitcoin.MyListener {
 
         // specify an adapter (see also next example)
         mAdapter = new BlocksAdapter(blocks);
+        mAdapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(mAdapter);
 
         refreshUI();
@@ -171,5 +175,14 @@ public class FragmentBlocks extends Fragment implements Bitcoin.MyListener {
         detach();
     }
 
-
+    @Override
+    public void onItemClick(View view, int position, String key) {
+        System.out.println("onItemClick" + key);
+        if (key == null) {
+            return;
+        }
+        Intent intent = new Intent(getContext(), BlockActivity.class);
+        intent.putExtra("block",key);
+        startActivityForResult(intent, MainActivity.RESULT_BLOCK);
+    }
 }

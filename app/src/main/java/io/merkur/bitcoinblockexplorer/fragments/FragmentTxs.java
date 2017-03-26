@@ -1,6 +1,7 @@
 package io.merkur.bitcoinblockexplorer.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,12 +27,15 @@ import java.util.List;
 import io.merkur.bitcoinblockexplorer.Bitcoin;
 import io.merkur.bitcoinblockexplorer.MyApplication;
 import io.merkur.bitcoinblockexplorer.R;
+import io.merkur.bitcoinblockexplorer.activities.MainActivity;
+import io.merkur.bitcoinblockexplorer.activities.PeerActivity;
+import io.merkur.bitcoinblockexplorer.activities.TxActivity;
 import io.merkur.bitcoinblockexplorer.adapters.TxsAdapter;
 
 import static io.merkur.bitcoinblockexplorer.Bitcoin.blockChain;
 
 
-public class FragmentTxs extends Fragment implements Bitcoin.MyListener {
+public class FragmentTxs extends Fragment implements Bitcoin.MyListener, TxsAdapter.OnItemClickListener {
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -41,7 +45,7 @@ public class FragmentTxs extends Fragment implements Bitcoin.MyListener {
 
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private TxsAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private TextView tvStatus;
     private List<Transaction> transactions = new ArrayList<>();
@@ -77,6 +81,7 @@ public class FragmentTxs extends Fragment implements Bitcoin.MyListener {
 
         // specify an adapter (see also next example)
         mAdapter = new TxsAdapter(transactions);
+        mAdapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(mAdapter);
 
         refreshUI();
@@ -163,6 +168,16 @@ public class FragmentTxs extends Fragment implements Bitcoin.MyListener {
     }
 
 
+    @Override
+    public void onItemClick(View view, int position, String key) {
+        System.out.println("onItemClick" + key);
+        if (key == null) {
+            return;
+        }
+        Intent intent = new Intent(getContext(), TxActivity.class);
+        intent.putExtra("tx",key);
+        startActivityForResult(intent, MainActivity.RESULT_TX);
+    }
 
 
 }
