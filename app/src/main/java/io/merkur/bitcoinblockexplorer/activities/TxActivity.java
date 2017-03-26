@@ -32,7 +32,8 @@ import io.merkur.bitcoinblockexplorer.insight.ValueOut;
 import io.merkur.bitcoinblockexplorer.R;
 import io.merkur.bitcoinblockexplorer.adapters.ItemAdapter;
 
-import static io.merkur.bitcoinblockexplorer.MyApplication.blockStore;
+import static io.merkur.bitcoinblockexplorer.Bitcoin.blockStore;
+
 
 public class TxActivity extends AppCompatActivity {
 

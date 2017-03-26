@@ -36,7 +36,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         public void onClick(View v) {
             System.out.println("onClick");
             String key = mTvKey.getText().toString();
-            mItemClickListener.onItemClick(v, getAdapterPosition(), key); //OnItemClickListener mItemClickListener;
+            if(mItemClickListener != null) {
+                mItemClickListener.onItemClick(v, getAdapterPosition(), key); //OnItemClickListener mItemClickListener;
+            }
         }
     }
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -82,8 +84,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         public void onItemClick(View view, int position, String id);
     }
 
-    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
+    public void setOnItemClickListener(OnItemClickListener itemClickListener) {
+        this.mItemClickListener = itemClickListener;
     }
 
     // Return the size of your dataset (invoked by the layout manager)

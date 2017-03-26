@@ -24,9 +24,10 @@ import io.merkur.bitcoinblockexplorer.R;
 import io.merkur.bitcoinblockexplorer.adapters.ItemAdapter;
 import io.merkur.bitcoinblockexplorer.insight.Insight;
 
-import static io.merkur.bitcoinblockexplorer.MyApplication.blockStore;
+import static io.merkur.bitcoinblockexplorer.Bitcoin.blockStore;
 
-public class BlockActivity extends AppCompatActivity {
+
+public class BlockActivity extends AppCompatActivity implements ItemAdapter.OnItemClickListener{
 
 
 
@@ -61,40 +62,8 @@ public class BlockActivity extends AppCompatActivity {
 
         // specify an adapter (see also next example)
         mAdapter = new ItemAdapter(mDataset);
+        mAdapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(mAdapter);
-
-        mAdapter.setOnItemClickListener(new ItemAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View v, int position, String key) {
-                System.out.println("onItemClick" + key);
-                if(key==null){
-                    return;
-                }
-                String value = mDataset.get(key);
-                if(value==null){
-                    return;
-                }
-                if(key.contains("Block")){
-                    Intent intent = new Intent(BlockActivity.this, BlockActivity.class);
-                    intent.putExtra("block", value);
-                    startActivity(intent);
-                } else if(key.contains(" Transaction")){
-                    Intent intent = new Intent(BlockActivity.this, TxActivity.class);
-                    intent.putExtra("tx", value);
-                    startActivity(intent);
-                } else {
-                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                        android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        clipboard.setText(value);
-                    } else {
-                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", value);
-                        clipboard.setPrimaryClip(clip);
-                    }
-                    MySnackbar.showPositive(BlockActivity.this, getResources().getString(R.string.copied_text_to_clipboard));
-                }
-            }
-        });
 
         setStatusPending();
 
@@ -145,16 +114,13 @@ public class BlockActivity extends AppCompatActivity {
                 if (block != null) {
                     mDataset = block.toDataset();
                     mAdapter = new ItemAdapter(mDataset);
+                    mAdapter.setOnItemClickListener(BlockActivity.this);
                     mRecyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
                 }
             }
         }.execute();
-
-
-
     }
-
 
 
     public void checkLocalBlockStore(){
@@ -239,4 +205,34 @@ public class BlockActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.tvStatus)).setText(message);
     }
 
+    @Override
+    public void onItemClick(View view, int position, String key) {
+        System.out.println("onItemClick" + key);
+        if (key == null) {
+            return;
+        }
+        String value = mDataset.get(key);
+        if (value == null) {
+            return;
+        }
+        if (key.contains("Block")) {
+            Intent intent = new Intent(BlockActivity.this, BlockActivity.class);
+            intent.putExtra("block", value);
+            startActivity(intent);
+        } else if (key.contains(" Transaction")) {
+            Intent intent = new Intent(BlockActivity.this, TxActivity.class);
+            intent.putExtra("tx", value);
+            startActivity(intent);
+        } else {
+            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                clipboard.setText(value);
+            } else {
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", value);
+                clipboard.setPrimaryClip(clip);
+            }
+            MySnackbar.showPositive(BlockActivity.this, getResources().getString(R.string.copied_text_to_clipboard));
+        }
+    }
 }

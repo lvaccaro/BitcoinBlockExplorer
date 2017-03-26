@@ -1,9 +1,13 @@
 package io.merkur.bitcoinblockexplorer.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -17,11 +21,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import io.merkur.bitcoinblockexplorer.Bitcoin;
 import io.merkur.bitcoinblockexplorer.ConnectivityReceiver;
 import io.merkur.bitcoinblockexplorer.MyApplication;
 import io.merkur.bitcoinblockexplorer.R;
@@ -31,6 +37,8 @@ import io.merkur.bitcoinblockexplorer.fragments.FragmentTxs;
 import io.merkur.bitcoinblockexplorer.insight.Block;
 import io.merkur.bitcoinblockexplorer.insight.Insight;
 import io.merkur.bitcoinblockexplorer.insight.Tx;
+
+import static io.merkur.bitcoinblockexplorer.MyApplication.REQUEST_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener, SearchView.OnCloseListener,
@@ -73,16 +81,6 @@ public class MainActivity extends AppCompatActivity
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        MyApplication.verifyStoragePermissions(this);
-
-        checkConnection();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ((MyApplication)getApplication()).startBlockChain();
-            }
-        }).start();
     }
 
     // Method to manually check connection status
@@ -107,12 +105,55 @@ public class MainActivity extends AppCompatActivity
 
         // register connection status listener
         MyApplication.getInstance().setConnectivityListener(this);
+
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
-    /**
-     * Callback will be triggered when there is change in
-     * network connection
-     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!MyApplication.verifyStoragePermissions(this))
+            return;
+
+        if (!Bitcoin.isStarted) {
+            checkConnection();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Bitcoin.startBlockChain();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Bitcoin.stopBlockChain();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+        /**
+         * Callback will be triggered when there is change in
+         * network connection
+         */
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
         showSnack((isConnected)?"Good! Sync starting":"Sorry! Not connected to internet");
@@ -120,14 +161,22 @@ public class MainActivity extends AppCompatActivity
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    ((MyApplication)getApplication()).startBlockChain();
+                    try {
+                        Bitcoin.startBlockChain();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }).start();
         } else {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    ((MyApplication)getApplication()).stopBlockChain();
+                    try {
+                        Bitcoin.stopBlockChain();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }).start();
         }
@@ -173,6 +222,44 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
             //searchable element
+            return true;
+        } else if (id == R.id.action_reset) {
+
+            final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Reset..");
+            alertDialog.setMessage("Are you sure?");
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,getString(android.R.string.ok), new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Bitcoin.stopBlockChain();
+                                Bitcoin.clearBlockChain();
+                                Bitcoin.startBlockChain();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
+            });
+            alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE,getString(android.R.string.cancel), new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    alertDialog.dismiss();
+                }
+            });
+            alertDialog.show();
+
+
+            return true;
+        } else if (id == R.id.action_github) {
+            //searchable element
+            String url="https://github.com/lvaccaro/BitcoinBlockExplorer";
+            Intent intent= new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
             return true;
         }
 
@@ -315,4 +402,30 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            String permissions[],
+            int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_EXTERNAL_STORAGE:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Bitcoin.startBlockChain();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                } else {
+                    Toast.makeText(MainActivity.this, "Permission Denied!", Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
 }

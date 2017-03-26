@@ -8,5 +8,8 @@
     <string name="peers_connected">Peers connected</string>
     <string name="transactions">Transactions</string>
     <string name="copied_text_to_clipboard">\"Copied text to Clipboard\"</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_github">GitHub</string>
+    <string name="action_reset">Reset Blockchain</string>
 
 </resources>

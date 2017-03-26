@@ -23,14 +23,15 @@ import org.bitcoinj.core.listeners.TransactionReceivedInBlockListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.merkur.bitcoinblockexplorer.Bitcoin;
 import io.merkur.bitcoinblockexplorer.MyApplication;
 import io.merkur.bitcoinblockexplorer.R;
 import io.merkur.bitcoinblockexplorer.adapters.TxsAdapter;
 
-import static io.merkur.bitcoinblockexplorer.MyApplication.blockChain;
+import static io.merkur.bitcoinblockexplorer.Bitcoin.blockChain;
 
 
-public class FragmentTxs extends Fragment implements MyApplication.MyListener {
+public class FragmentTxs extends Fragment implements Bitcoin.MyListener {
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -114,14 +115,14 @@ public class FragmentTxs extends Fragment implements MyApplication.MyListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        MyApplication.mListeners.add(this);
+        Bitcoin.mListeners.add(this);
         attach();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        MyApplication.mListeners.remove(this);
+        Bitcoin.mListeners.remove(this);
     }
 
     public void attach() {

@@ -27,16 +27,17 @@ import java.util.LinkedHashMap;
 
 import javax.annotation.Nullable;
 
+import io.merkur.bitcoinblockexplorer.Bitcoin;
 import io.merkur.bitcoinblockexplorer.MyApplication;
 import io.merkur.bitcoinblockexplorer.R;
 import io.merkur.bitcoinblockexplorer.adapters.BlocksAdapter;
 
-import static io.merkur.bitcoinblockexplorer.MyApplication.blockChain;
-import static io.merkur.bitcoinblockexplorer.MyApplication.blockStore;
-import static io.merkur.bitcoinblockexplorer.MyApplication.peerGroup;
+import static io.merkur.bitcoinblockexplorer.Bitcoin.blockChain;
+import static io.merkur.bitcoinblockexplorer.Bitcoin.blockStore;
+import static io.merkur.bitcoinblockexplorer.Bitcoin.peerGroup;
 
 
-public class FragmentBlocks extends Fragment implements MyApplication.MyListener {
+public class FragmentBlocks extends Fragment implements Bitcoin.MyListener {
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -117,14 +118,14 @@ public class FragmentBlocks extends Fragment implements MyApplication.MyListener
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        MyApplication.mListeners.add(this);
+        Bitcoin.mListeners.add(this);
         attach();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        MyApplication.mListeners.remove(this);
+        Bitcoin.mListeners.remove(this);
     }
 
     public void attach() {

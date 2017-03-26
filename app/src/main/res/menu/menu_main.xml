@@ -8,4 +8,11 @@
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView"/>
 
+    <item android:id="@+id/action_reset"
+        android:title="@string/action_reset"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_github"
+        android:title="@string/action_github"
+        app:showAsAction="never"/>
 </menu>

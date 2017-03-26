@@ -20,14 +20,15 @@ import org.bitcoinj.core.listeners.PeerDisconnectedEventListener;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import io.merkur.bitcoinblockexplorer.Bitcoin;
 import io.merkur.bitcoinblockexplorer.MyApplication;
 import io.merkur.bitcoinblockexplorer.R;
 import io.merkur.bitcoinblockexplorer.adapters.PeersAdapter;
 
-import static io.merkur.bitcoinblockexplorer.MyApplication.peerGroup;
+import static io.merkur.bitcoinblockexplorer.Bitcoin.peerGroup;
 
 
-public class FragmentPeers extends Fragment implements MyApplication.MyListener {
+public class FragmentPeers extends Fragment implements Bitcoin.MyListener {
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -108,14 +109,14 @@ public class FragmentPeers extends Fragment implements MyApplication.MyListener 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        MyApplication.mListeners.add(this);
+        Bitcoin.mListeners.add(this);
         attach();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        MyApplication.mListeners.remove(this);
+        Bitcoin.mListeners.remove(this);
     }
 
 
