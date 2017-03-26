@@ -29,6 +29,7 @@ public class BlocksAdapter extends RecyclerView.Adapter<BlocksAdapter.ViewHolder
 public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     // each data item is just a string in this case
     public TextView mTvTitle,mTvBlockHash,mTvHeight,mTvTransactions;
+    public String key;
     public ViewHolder(View v) {
         super(v);
         mTvTitle = (TextView) v.findViewById(R.id.tvTitle);
@@ -43,7 +44,6 @@ public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickL
     @Override
     public void onClick(View v) {
         System.out.println("onClick");
-        String key = mTvBlockHash.getText().toString();
         if(mItemClickListener != null) {
             mItemClickListener.onItemClick(v, getAdapterPosition(), key); //OnItemClickListener mItemClickListener;
         }
@@ -80,6 +80,7 @@ public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickL
             holder.mTvBlockHash.setText(block.getHashAsString());
             holder.mTvHeight.setText("Height: " + String.valueOf(height));
             holder.mTvTransactions.setText("Transactions: " + block.getTransactions().size());
+            holder.key = block.getHashAsString().toString();
         }
     }
 

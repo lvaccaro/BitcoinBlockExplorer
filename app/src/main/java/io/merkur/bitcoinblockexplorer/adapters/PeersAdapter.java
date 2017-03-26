@@ -29,6 +29,7 @@ public class PeersAdapter extends RecyclerView.Adapter<PeersAdapter.ViewHolder> 
 public class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
     // each data item is just a string in this case
     public TextView mTvTitle,mTvIp,mTvBestHeight,mTvLastPingTime;
+    public String key;
     public ViewHolder(View v) {
         super(v);
         mTvTitle = (TextView) v.findViewById(R.id.tvTitle);
@@ -44,7 +45,6 @@ public class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClick
     @Override
     public void onClick(View v) {
         System.out.println("onClick");
-        String key = mTvIp.getText().toString();
         if(mItemClickListener != null) {
             mItemClickListener.onItemClick(v, getAdapterPosition(), key); //OnItemClickListener mItemClickListener;
         }
@@ -74,13 +74,16 @@ public class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClick
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        final Peer peer = (Peer)(mDataset.keySet().toArray()[position]);
-        String name = (String) (mDataset.values().toArray())[position];
+        synchronized (mDataset) {
+            final Peer peer = (Peer) (mDataset.keySet().toArray()[position]);
+            String name = (String) (mDataset.values().toArray())[position];
 
-        holder.mTvTitle.setText(name.toString());
-        holder.mTvIp.setText("Host: "+peer.getAddress().toString());
-        holder.mTvBestHeight.setText("BestHeight: "+String.valueOf(peer.getBestHeight()));
-        holder.mTvLastPingTime.setText("LastPingTime: "+String.valueOf(peer.getLastPingTime()));
+            holder.mTvTitle.setText(name.toString());
+            holder.mTvIp.setText("Host: " + peer.getAddress().toString());
+            holder.mTvBestHeight.setText("BestHeight: " + String.valueOf(peer.getBestHeight()));
+            holder.mTvLastPingTime.setText("LastPingTime: " + String.valueOf(peer.getLastPingTime()));
+            holder.key = peer.getAddress().toString();
+        }
     }
 
 

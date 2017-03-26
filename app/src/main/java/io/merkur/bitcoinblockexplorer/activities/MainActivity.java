@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity
         // register connection status listener
         MyApplication.getInstance().setConnectivityListener(this);
 
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -138,13 +138,13 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
-        }).start();
+        }).start();*/
 
     }
     @Override
     protected void onPause() {
         super.onPause();
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
-        }).start();
+        }).start();*/
     }
 
         /**
@@ -435,4 +435,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }
