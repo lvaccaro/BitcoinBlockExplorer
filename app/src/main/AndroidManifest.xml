@@ -20,7 +20,6 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -28,7 +27,16 @@
         <activity
             android:name="io.merkur.bitcoinblockexplorer.activities.PeerActivity"
             android:label="@string/title_activity_peer"
-            android:parentActivityName=".activities.MainActivity"/>
+            android:parentActivityName=".activities.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                    android:path="/search"
+                    android:host="insight.bitpay.com" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name="io.merkur.bitcoinblockexplorer.activities.BlockActivity"

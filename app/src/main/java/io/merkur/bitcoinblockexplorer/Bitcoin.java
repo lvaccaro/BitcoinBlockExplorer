@@ -69,9 +69,10 @@ public class Bitcoin {
             throw new Exception();
         }
 
-        // work with testnet
+        // work with net
         Log.d("BITCOINJ","Set Network\n");
-        netParams = TestNet3Params.get();
+        //netParams = TestNet3Params.get();
+        netParams = NetworkParameters.prodNet();
         Log.d("BITCOINJ","Network = " + netParams.toString()+"\n");
 
         // Load the block chain data file or generate a new one

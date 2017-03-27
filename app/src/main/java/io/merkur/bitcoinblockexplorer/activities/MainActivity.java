@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -104,6 +105,13 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        // Get bundle object at appropriate place in your code
+        try {
+            String data = getIntent().getDataString();
+            Log.d("data",data);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     // Method to manually check connection status
