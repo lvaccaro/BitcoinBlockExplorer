@@ -102,8 +102,6 @@ public class TxActivity extends AppCompatActivity {
 
                     // Get tx from insight
                     tx = Insight.getTx(tx_address);
-                    if(tx==null)
-                        return false;
 
                     // Get block from insight
                     block = Insight.getBlock(tx.blockhash);
@@ -116,7 +114,7 @@ public class TxActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                return false;
+                return true;
             }
 
             @Override

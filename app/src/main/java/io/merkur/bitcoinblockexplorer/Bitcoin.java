@@ -35,7 +35,7 @@ public class Bitcoin {
     public static NetworkParameters netParams;
     public static PeerGroup peerGroup;
     //public static MemoryBlockStore blockStore;
-    public static BlockStore blockStore;
+    public static DiskBlockStore blockStore;
     public static BlockChain blockChain;
     public static Bitcoin.MyDownload myDownload;
     public static List<Bitcoin.MyListener> mListeners = new ArrayList<>();
@@ -83,7 +83,6 @@ public class Bitcoin {
             blockStoreFile.createNewFile();
             Log.d("BITCOINJ","BlockStoreFile created");
         }
-
         try {
             blockStore = new DiskBlockStore(netParams,blockStoreFile);
         } catch (BlockStoreException e) {
@@ -135,9 +134,11 @@ public class Bitcoin {
         if(peerGroup!=null && peerGroup.isRunning()) {
             peerGroup.stop();
         }
+        if(blockStore==null)
+            return;
         try {
             blockStore.close();
-        } catch (BlockStoreException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -12,7 +12,8 @@ import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class Insight {
 
-    public static String url = "https://test-insight.bitpay.com/api";
+    //public static String url = "https://test-insight.bitpay.com/api";
+    public static String url = "https://insight.bitpay.com/api";
 
     public static Block getBlock(String blockhash) throws Exception {
         HttpGet httppost = new HttpGet(Insight.url + "/block/" + blockhash);

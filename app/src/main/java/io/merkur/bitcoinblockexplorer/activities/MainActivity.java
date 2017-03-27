@@ -106,12 +106,12 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Get bundle object at appropriate place in your code
-        try {
+        /*try {
             String data = getIntent().getDataString();
             Log.d("data",data);
         }catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
     }
 
     // Method to manually check connection status
