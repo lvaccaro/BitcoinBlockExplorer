@@ -11,5 +11,16 @@
     <string name="action_settings">Settings</string>
     <string name="action_github">GitHub</string>
     <string name="action_reset">Reset Blockchain</string>
-
+    <string name="permission_denied">Permission Denied!</string>
+    <string name="no_height_block_tx_found">No height/block/tx found</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="reset">Reset..</string>
+    <string name="good_internet_connection">Good! Internet connection</string>
+    <string name="no_internet_connection">Sorry! Not connected to internet</string>
+    <string name="start">Start</string>
+    <string name="blockchain_synchronization_popup">The blockchain synchronization can take several minutes and download more then 100MB. Are you sure to continue now?</string>
+    <string name="action_startsync">Start sync</string>
+    <string name="action_stopsync">Stop sync</string>
+    <string name="start_sync">Start Sync</string>
+    <string name="stop_sync">Stop Sync</string>
 </resources>
