@@ -13,10 +13,13 @@ import android.widget.TextView;
 import org.bitcoinj.core.Peer;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import com.vaccarostudio.bitcoinblockexplorer.MySnackbar;
 import com.vaccarostudio.bitcoinblockexplorer.R;
 import com.vaccarostudio.bitcoinblockexplorer.adapters.ItemAdapter;
+import com.vaccarostudio.bitcoinblockexplorer.fragments.FragmentPeers;
 import com.vaccarostudio.bitcoinblockexplorer.ipapi.Geocode;
 import com.vaccarostudio.bitcoinblockexplorer.ipapi.Hostplace;
 
@@ -32,6 +35,7 @@ public class PeerActivity extends AppCompatActivity {
     private final LinkedHashMap<String, String> mDataset = new LinkedHashMap<>();
     private Peer peer;
     private Hostplace hostplace;
+    private String hostname;
 
 
     @Override
@@ -75,14 +79,17 @@ public class PeerActivity extends AppCompatActivity {
             throw new Exception();
         }
 
+        if(peerGroup==null){
+            throw new Exception();
+        }
+
         peer=null;
-        for(Peer p : peerGroup.getConnectedPeers()){
-            if (p.getAddress().toString().equals(peer_address)){
-                peer=p;
+        for ( Map.Entry<Peer, String> p : FragmentPeers.reverseDnsLookups.entrySet()){
+            if (p.getKey().getAddress().toString().equals(peer_address)){
+                peer=p.getKey();
             }
         }
 
-        setStatus(peer.getAddress().getAddr().getCanonicalHostName());
         mDataset.put("Address",peer.getAddress().toString());
         mDataset.put("BestHeight",String.valueOf(peer.getBestHeight()));
         mDataset.put("PingTime",String.valueOf(peer.getPingTime()));
@@ -92,15 +99,13 @@ public class PeerActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
 
 
-
-
         new AsyncTask<Void,Void,Boolean>(){
             @Override
             protected Boolean doInBackground(Void... voids) {
                 try {
                     hostplace = null;
-
-                    hostplace = Geocode.get(peer.getAddress().getAddr().getHostAddress());
+                    hostname = peer.getAddress().getAddr().getCanonicalHostName();
+                    hostplace = Geocode.get(hostname);
                     return true;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -109,8 +114,14 @@ public class PeerActivity extends AppCompatActivity {
             }
 
             @Override
+            protected void onPreExecute(){
+                setStatus(getString(R.string.reversingip));
+            }
+
+            @Override
             protected void onPostExecute(Boolean aBoolean) {
                 super.onPostExecute(aBoolean);
+                setStatus(hostname);
                 if (aBoolean == false){
                     MySnackbar.showNegative(PeerActivity.this,"Sorry! Host Geolocation Failure");
                     return;

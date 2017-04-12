@@ -2,6 +2,7 @@ package com.vaccarostudio.bitcoinblockexplorer;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.support.multidex.MultiDex;
@@ -22,6 +23,13 @@ public class MyApplication extends MultiDexApplication {
         MultiDex.install(this);
         mInstance = this;
     }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
+
 
     @Override
     public void onLowMemory() {

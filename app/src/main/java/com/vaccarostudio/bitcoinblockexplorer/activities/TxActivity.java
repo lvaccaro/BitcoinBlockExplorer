@@ -1,5 +1,6 @@
 package com.vaccarostudio.bitcoinblockexplorer.activities;
 
+import android.app.ProgressDialog;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.bitcoinj.core.Sha256Hash;
@@ -111,11 +113,12 @@ public class TxActivity extends AppCompatActivity {
             protected void onPreExecute() {
                 super.onPreExecute();
                 setStatus("Verification Pending");
+                progress(true);
             }
             @Override
             protected void onPostExecute(Boolean aBoolean) {
                 super.onPostExecute(aBoolean);
-
+                progress(false);
                 if (aBoolean == false) {
                     MySnackbar.showNegative(TxActivity.this, "Sorry! Tx not found");
                     setStatus("Verification Failed");
@@ -204,5 +207,22 @@ public class TxActivity extends AppCompatActivity {
 
     public void setStatus(String message){
         ((TextView)findViewById(R.id.tvStatus)).setText(message);
+    }
+
+
+
+    private ProgressDialog mProgressDialog;
+    public void progress(boolean status){
+        if(mProgressDialog==null){
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Downloading........");
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setCancelable(false);
+        }
+        if(status==true){
+            mProgressDialog.show();
+        }else{
+            mProgressDialog.hide();
+        }
     }
 }

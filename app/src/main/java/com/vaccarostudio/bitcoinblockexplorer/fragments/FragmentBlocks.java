@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,12 +93,12 @@ public class FragmentBlocks extends Fragment implements Bitcoin.MyListener, Bloc
     BlocksDownloadedEventListener blocksDownloadedEventListener=new BlocksDownloadedEventListener() {
         @Override
         public void onBlocksDownloaded(Peer peer, Block block, @Nullable FilteredBlock filteredBlock, int blocksLeft) {
-            //Log.d("BlocksDownloaded",block.toString());
+            Log.d("BlocksDownloaded",block.getHashAsString());
             Integer height=blockChain.getChainHead().getHeight();
 
             synchronized (blocks) {
                 blocks.put(block, height);
-                if (blocks.keySet().size() >= 10) {
+                if (blocks.keySet().size() >= 30) {
                     blocks.remove(blocks.keySet().toArray()[blocks.keySet().size() - 1]);
                 }
             }
@@ -112,7 +113,7 @@ public class FragmentBlocks extends Fragment implements Bitcoin.MyListener, Bloc
     NewBestBlockListener newBestBlockListener = new NewBestBlockListener() {
         @Override
         public void notifyNewBestBlock(StoredBlock block) throws VerificationException {
-            //Log.d("NewBestBlock",block.toString());
+            ;//Log.d("NewBestBlock",block.toString());
         }
     };
 
@@ -144,7 +145,7 @@ public class FragmentBlocks extends Fragment implements Bitcoin.MyListener, Bloc
         }
     }
 
-    private void refreshUI(){
+    private synchronized void refreshUI(){
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -153,7 +154,10 @@ public class FragmentBlocks extends Fragment implements Bitcoin.MyListener, Bloc
                         tvStatus.setText("0 "+ getResources().getString(R.string.current_height));
                     }else {
                         Integer maxHeight = peerGroup.getMostCommonChainHeight();
-                        Integer curHeight = blockStore.getChainHead().getHeight();
+                        Integer curHeight = 0;
+                        if(blockStore.getChainHead()!=null) {
+                            curHeight = blockStore.getChainHead().getHeight();
+                        }
 
                         tvStatus.setText(curHeight + "/" + maxHeight + " " + getResources().getString(R.string.current_height));
                         mAdapter.notifyDataSetChanged();

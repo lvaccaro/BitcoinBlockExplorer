@@ -55,7 +55,7 @@ public class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClick
                                                     int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.tx, parent, false);
+                .inflate(R.layout.tx2, parent, false);
         // set the view's size, margins, paddings and layout parameters
 
         ViewHolder vh = new ViewHolder(v);

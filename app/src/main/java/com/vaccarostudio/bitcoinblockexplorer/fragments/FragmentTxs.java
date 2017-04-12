@@ -94,7 +94,7 @@ public class FragmentTxs extends Fragment implements Bitcoin.MyListener, TxsAdap
             synchronized (transactions) {
                 countTransactions++;
                 transactions.add(tx);
-                if (transactions.size() >= 10) {
+                if (transactions.size() >= 30) {
                     transactions.remove(10);
                 }
             }

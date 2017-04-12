@@ -1,8 +1,11 @@
 package com.vaccarostudio.bitcoinblockexplorer;
 
+import android.content.Context;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.vaccarostudio.bitcoinblockexplorer.sqlite.SQLiteBlockStore;
 
 import org.bitcoinj.core.Block;
 import org.bitcoinj.core.BlockChain;
@@ -14,6 +17,8 @@ import org.bitcoinj.core.Peer;
 import org.bitcoinj.core.PeerGroup;
 import org.bitcoinj.core.listeners.DownloadProgressTracker;
 import org.bitcoinj.net.discovery.DnsDiscovery;
+import org.bitcoinj.params.TestNet3Params;
+import org.bitcoinj.store.BlockStore;
 import org.bitcoinj.store.BlockStoreException;
 
 import java.io.File;
@@ -30,7 +35,7 @@ public class Bitcoin {
     public static NetworkParameters netParams;
     public static PeerGroup peerGroup;
     //public static MemoryBlockStore blockStore;
-    public static DiskBlockStore blockStore;
+    public static SQLiteBlockStore blockStore;
     public static BlockChain blockChain;
     public static Bitcoin.MyDownload myDownload;
     public static List<Bitcoin.MyListener> mListeners = new ArrayList<>();
@@ -44,7 +49,7 @@ public class Bitcoin {
     public static String checkpointsFilename = filePrefix + CHECKPOINTS_SUFFIX;
     public static String diskFilename = filePrefix + DISK_SUFFIX;
 
-    public static File blockStoreFile;
+    //public static File blockStoreFile;
     public static Boolean isInitialize=false;
     public static Boolean isPaused=false;
 
@@ -60,6 +65,11 @@ public class Bitcoin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        try {
+            blockStoreFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         isInitialize=false;
         isPaused=true;
@@ -67,7 +77,7 @@ public class Bitcoin {
 
 
 
-    public static void init() throws Exception {
+    public static void init(Context context) throws Exception {
 
         if (isInitialize == true) {
             Log.d("BITCOINJ", "Just started\n");
@@ -81,7 +91,7 @@ public class Bitcoin {
         Log.d("BITCOINJ", "Network = " + netParams.toString() + "\n");
 
         // Load the block chain data file or generate a new one
-        String blockchainFilename = Environment.getExternalStorageDirectory() + "/" + diskFilename;
+        /*String blockchainFilename = Environment.getExternalStorageDirectory() + "/" + diskFilename;
         Log.d("BITCOINJ", "Get or create SPV block store:" + blockchainFilename + "\n");
         blockStoreFile = new File(blockchainFilename);
         if (!blockStoreFile.exists()) {
@@ -94,7 +104,9 @@ public class Bitcoin {
             e.printStackTrace();
             Log.d("BITCOINJ", "Failed to get or create block store: " + e.getMessage());
             throw new Exception(e);
-        }
+        }*/
+        blockStore = new SQLiteBlockStore(netParams,MyApplication.getInstance());
+
 
         // initialize BlockChain object
         Log.d("BITCOINJ", "Create BlockChain");
@@ -119,6 +131,7 @@ public class Bitcoin {
             return;
         isPaused=true;
 
+        Log.d("BITCOINJ", "Open SQLDB BlockStore");
         if(myDownload!=null){
             myDownload.doneDownload();
         }
@@ -128,25 +141,26 @@ public class Bitcoin {
         }
     }
 
-    public static void resume(){
-        if(isInitialize==false)
+    public static void resume() {
+        if (isInitialize == false)
             return;
-        if(isPaused==false)
+        if (isPaused == false)
             return;
-        isPaused=false;
+        isPaused = false;
 
 
-            Log.d("BITCOINJ", "Create PeerGroup");
-            peerGroup = new PeerGroup(netParams, blockChain);
-            peerGroup.setUserAgent("PeerMonitor", "1.0");
-            peerGroup.setMaxConnections(4);
-            peerGroup.addPeerDiscovery(new DnsDiscovery(netParams));
+        Log.d("BITCOINJ", "Create PeerGroup");
+        peerGroup = new PeerGroup(netParams, blockChain);
+        peerGroup.setUserAgent("PeerMonitor", "1.0");
+        peerGroup.setMaxConnections(4);
+        peerGroup.addPeerDiscovery(new DnsDiscovery(netParams));
 
-            Log.d("BITCOINJ","Start Asynchronous PeerGroup");
-            peerGroup.start();
-            Log.d("BITCOINJ","Download Started");
-            myDownload = new MyDownload();
-            peerGroup.startBlockChainDownload(myDownload);
+        Log.d("BITCOINJ", "Start Asynchronous PeerGroup");
+        peerGroup.start();
+        Log.d("BITCOINJ", "Download Started");
+        myDownload = new MyDownload();
+        peerGroup.startBlockChainDownload(myDownload);
+
     }
 
     public static void destroy(){

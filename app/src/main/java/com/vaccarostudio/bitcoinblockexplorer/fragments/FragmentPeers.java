@@ -42,7 +42,7 @@ public class FragmentPeers extends Fragment implements Bitcoin.MyListener, Peers
     private PeersAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private TextView tvStatus;
-    public final LinkedHashMap<Peer, String> reverseDnsLookups = new LinkedHashMap<>();
+    public static final LinkedHashMap<Peer, String> reverseDnsLookups = new LinkedHashMap<>();
     private long lastTimestamp=0;
 
     public FragmentPeers() {

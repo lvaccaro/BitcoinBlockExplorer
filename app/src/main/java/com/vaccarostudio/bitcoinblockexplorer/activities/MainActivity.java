@@ -131,31 +131,14 @@ public class MainActivity extends AppCompatActivity
         // register connection status listener
         MyApplication.getInstance().setConnectivityListener(this);
 
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Bitcoin.resume();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();*/
+        popupStarting();
+
 
     }
     @Override
     protected void onPause() {
         super.onPause();
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Bitcoin.pause();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();*/
+        stopping();
     }
 
         /**
@@ -473,7 +456,7 @@ public class MainActivity extends AppCompatActivity
             protected Boolean doInBackground(Void... voids) {
                 try {
                     if (Bitcoin.isInitialize == false) {
-                        Bitcoin.init();
+                        Bitcoin.init(getApplicationContext());
                     }
                     Bitcoin.resume();
                 } catch (Exception e) {
@@ -541,7 +524,7 @@ public class MainActivity extends AppCompatActivity
                 try {
                     Bitcoin.destroy();
                     Bitcoin.clear();
-                    Bitcoin.init();
+                    Bitcoin.init(getApplicationContext());
                     Bitcoin.resume();
                 } catch (Exception e) {
                     e.printStackTrace();

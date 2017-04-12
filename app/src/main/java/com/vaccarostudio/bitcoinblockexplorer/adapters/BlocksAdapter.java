@@ -10,6 +10,7 @@ import com.vaccarostudio.bitcoinblockexplorer.R;
 
 import org.bitcoinj.core.Block;
 
+import java.text.SimpleDateFormat;
 import java.util.LinkedHashMap;
 
 
@@ -56,7 +57,7 @@ public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickL
                                                        int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.block, parent, false);
+                .inflate(R.layout.block2, parent, false);
         // set the view's size, margins, paddings and layout parameters
 
         ViewHolder vh = new ViewHolder(v);
@@ -72,10 +73,12 @@ public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickL
             final Block block = (Block) (mDataset.keySet().toArray()[position]);
             Integer height = (Integer) (mDataset.values().toArray())[position];
 
-            holder.mTvTitle.setText(block.getTime().toLocaleString());
+            SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            String formatted = dateFormat.format(block.getTime());
+            holder.mTvTitle.setText(formatted);
             holder.mTvBlockHash.setText(block.getHashAsString());
-            holder.mTvHeight.setText("Height: " + String.valueOf(height));
-            holder.mTvTransactions.setText("Transactions: " + block.getTransactions().size());
+            holder.mTvHeight.setText(String.valueOf(height));
+            holder.mTvTransactions.setText(String.valueOf(block.getTransactions().size()));
             holder.key = block.getHashAsString().toString();
         }
     }

@@ -1,5 +1,6 @@
 package com.vaccarostudio.bitcoinblockexplorer.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -91,64 +92,54 @@ public class BlockActivity extends AppCompatActivity implements ItemAdapter.OnIt
                 try {
                     block = null;
                     block = Insight.getBlock(block_address);
-                    return true;
+
+                    if(block == null){
+                        return true;
+                    }
+                    storedBlock = null;
+                    Sha256Hash blockHash = new Sha256Hash(block_address);
+                    storedBlock = Bitcoin.blockStore.get(blockHash);
+
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return false;
                 }
-                return false;
+                return true;
             }
 
             @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progress(true);
+
+            }
+            @Override
             protected void onPostExecute(Boolean aBoolean) {
                 super.onPostExecute(aBoolean);
+                progress(false);
                 if (aBoolean == false){
                     MySnackbar.showNegative(BlockActivity.this, "Sorry! Not connected to internet");
                     setStatusFailed();
                     return;
                 }
 
-                checkLocalBlockStore();
-
                 mDataset.clear();
-                if (block != null) {
-                    mDataset = block.toDataset();
-                    mAdapter = new ItemAdapter(mDataset);
-                    mAdapter.setOnItemClickListener(BlockActivity.this);
-                    mRecyclerView.setAdapter(mAdapter);
-                    mAdapter.notifyDataSetChanged();
-                }
-            }
-        }.execute();
-    }
+                mDataset = block.toDataset();
+                mAdapter = new ItemAdapter(mDataset);
+                mAdapter.setOnItemClickListener(BlockActivity.this);
+                mRecyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
 
-
-    public void checkLocalBlockStore(){
-        new AsyncTask<Void,Void,Boolean>(){
-            @Override
-            protected Boolean doInBackground(Void... voids) {
-                try {
-                    storedBlock = null;
-                    Sha256Hash blockHash = new Sha256Hash(block_address);
-                    storedBlock = Bitcoin.blockStore.get(blockHash);
-                    return true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return false;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean aBoolean) {
-                super.onPostExecute(aBoolean);
-                if (aBoolean == false){
-                    MySnackbar.showNegative(BlockActivity.this, "No block found");
-                    setStatusFailed();
+                if (block == null) {
+                    MySnackbar.showWarning(BlockActivity.this, "Block not valid!");
                     return;
                 }
+
                 if (storedBlock == null){
                     MySnackbar.showWarning(BlockActivity.this, "Blockchain not sync");
                     return;
                 }
+
                 if( block.equals(storedBlock) ){
                     MySnackbar.showPositive(BlockActivity.this, "Verification Success");
                     setStatusSuccess();
@@ -156,17 +147,11 @@ public class BlockActivity extends AppCompatActivity implements ItemAdapter.OnIt
                     MySnackbar.showNegative(BlockActivity.this, "Verification Failed");
                     setStatusFailed();
                 }
-
-            }
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                MySnackbar.showWarning(BlockActivity.this, "Waiting sync");
-                setStatusPending();
             }
         }.execute();
     }
+
+
 
 
     private void refresh(final StoredBlock storedBlock){
@@ -235,6 +220,21 @@ public class BlockActivity extends AppCompatActivity implements ItemAdapter.OnIt
                 clipboard.setPrimaryClip(clip);
             }
             MySnackbar.showPositive(BlockActivity.this, getResources().getString(R.string.copied_text_to_clipboard));
+        }
+    }
+
+    private ProgressDialog mProgressDialog;
+    public void progress(boolean status){
+        if(mProgressDialog==null){
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Downloading........");
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setCancelable(false);
+        }
+        if(status==true){
+            mProgressDialog.show();
+        }else{
+            mProgressDialog.hide();
         }
     }
 }
