@@ -149,4 +149,9 @@ public class SQLiteBlockStore implements BlockStore {
         this.chainHead = storedGenesis.getHeader().getHash();
         this.put(storedGenesis);
     }
+
+    public void clear(){
+        blocksDataSource.removeAll();
+    }
+
 }

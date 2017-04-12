@@ -54,21 +54,9 @@ public class Bitcoin {
     public static Boolean isPaused=false;
 
     public static void clear(){
-        Log.d("BITCOINJ","Remove SPV block store:"+blockchainFilename+"\n");
-        File blockStoreFile = new File(blockchainFilename);
-        if(blockStoreFile.exists()){
-            blockStoreFile.delete();
-            Log.d("BITCOINJ","BlockStoreFile deleted");
-        }
-        try {
-            blockStoreFile.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            blockStoreFile.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        if(blockStore!=null) {
+            blockStore.clear();
         }
 
         isInitialize=false;

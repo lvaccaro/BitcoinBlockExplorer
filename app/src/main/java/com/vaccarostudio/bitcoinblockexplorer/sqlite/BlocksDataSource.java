@@ -127,4 +127,10 @@ public class BlocksDataSource {
         block.setChainWork(new BigInteger(cursor.getString(4)));
         return block;
     }
+
+
+    public void removeAll()
+    {
+        database.delete(MySQLiteHelper.TABLE_BLOCKSTORE, null, null);
+    }
 }
