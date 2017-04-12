@@ -151,7 +151,9 @@ public class SQLiteBlockStore implements BlockStore {
     }
 
     public void clear(){
+        blocksDataSource.open();
         blocksDataSource.removeAll();
+        blocksDataSource.close();
     }
 
 }
