@@ -140,7 +140,7 @@ public class Bitcoin {
         Log.d("BITCOINJ", "Create PeerGroup");
         peerGroup = new PeerGroup(netParams, blockChain);
         peerGroup.setUserAgent("PeerMonitor", "1.0");
-        peerGroup.setMaxConnections(4);
+        peerGroup.setMaxConnections(8);
         peerGroup.addPeerDiscovery(new DnsDiscovery(netParams));
 
         Log.d("BITCOINJ", "Start Asynchronous PeerGroup");

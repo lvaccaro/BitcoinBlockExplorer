@@ -58,7 +58,7 @@ public class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClick
                                                       int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.peer, parent, false);
+                .inflate(R.layout.peer2, parent, false);
         // set the view's size, margins, paddings and layout parameters
 
         ViewHolder vh = new ViewHolder(v);
@@ -76,9 +76,9 @@ public class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClick
             String name = (String) (mDataset.values().toArray())[position];
 
             holder.mTvTitle.setText(name.toString());
-            holder.mTvIp.setText("Host: " + peer.getAddress().toString());
-            holder.mTvBestHeight.setText("BestHeight: " + String.valueOf(peer.getBestHeight()));
-            holder.mTvLastPingTime.setText("LastPingTime: " + String.valueOf(peer.getLastPingTime()));
+            holder.mTvIp.setText(String.valueOf(peer.getAddress().getPort()));
+            //holder.mTvBestHeight.setText("BestHeight: " + String.valueOf(peer.getBestHeight()));
+            //holder.mTvLastPingTime.setText("LastPingTime: " + String.valueOf(peer.getLastPingTime()));
             holder.key = peer.getAddress().toString();
         }
     }

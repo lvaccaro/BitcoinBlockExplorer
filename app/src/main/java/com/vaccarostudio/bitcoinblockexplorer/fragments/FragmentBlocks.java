@@ -93,7 +93,7 @@ public class FragmentBlocks extends Fragment implements Bitcoin.MyListener, Bloc
     BlocksDownloadedEventListener blocksDownloadedEventListener=new BlocksDownloadedEventListener() {
         @Override
         public void onBlocksDownloaded(Peer peer, Block block, @Nullable FilteredBlock filteredBlock, int blocksLeft) {
-            Log.d("BlocksDownloaded",block.getHashAsString());
+            //Log.d("BlocksDownloaded",block.getHashAsString());
             Integer height=blockChain.getChainHead().getHeight();
 
             synchronized (blocks) {
